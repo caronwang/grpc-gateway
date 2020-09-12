@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package hello_http;
-option go_package = "hello_http";
+option go_package = "proto/hello_http";
 
 import "google/api/annotations.proto";
 

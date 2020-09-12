@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -27,6 +28,6 @@ func main() {
 		grpclog.Fatalf("Register handler err:%v\n", err)
 	}
 
-	grpclog.Println("HTTP Listen on 8080")
+	fmt.Println("HTTP Listen on 8080")
 	http.ListenAndServe(":8080", mux)
 }

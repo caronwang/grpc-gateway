@@ -7,12 +7,12 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
-	pb "grpc-gateway/proto/hello_http" // 引入编译生成的包
+	. "grpc-gateway/proto/hello_http"
 )
 
 const (
 	// Address gRPC服务地址
-	Address = "caron:50052"
+	Address = "127.0.0.1:50052"
 )
 
 // 定义helloService并实现约定的接口
@@ -22,8 +22,8 @@ type helloService struct{}
 var HelloService = helloService{}
 
 // SayHello 实现Hello服务接口
-func (h helloService) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloResponse, error) {
-	resp := new(pb.HelloResponse)
+func (h helloService) SayHello(ctx context.Context, in *HelloHTTPRequest) (*HelloHTTPResponse, error) {
+	resp := new(HelloHTTPResponse)
 	resp.Message = fmt.Sprintf("Hello %s.", in.Name)
 
 	return resp, nil
@@ -41,7 +41,7 @@ func main() {
 	s = grpc.NewServer()
 
 	// 注册HelloService
-	pb.RegisterHelloServer(s, HelloService)
+	RegisterHelloHTTPServer(s, HelloService)
 
 	fmt.Println("Listen on " + Address)
 	s.Serve(listen)

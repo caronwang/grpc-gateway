@@ -63,24 +63,24 @@ message HelloHTTPResponse {
 }
 ```
 
-Step 2. 编译proto
+Step 2. 编译proto，运行gen.sh文件
 ```shell script
-$ cd proto
+protoc -I/usr/local/include -I. \
+  -I$GOPATH/src \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  --go_out=plugins=grpc:. \
+  proto/hello_http/*.proto
 
-# 编译google.api
-$ protoc -I . --go_out=plugins=grpc,Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor:. google/api/*.proto
-
-# 编译hello_http.proto
-$ protoc -I . --go_out=plugins=grpc,Mgoogle/api/annotations.proto=github.com/jergoo/go-grpc-example/proto/google/api:. hello_http/*.proto
-
-# 编译hello_http.proto gateway
-$ protoc --grpc-gateway_out=logtostderr=true:. hello_http/hello_http.proto
+protoc -I/usr/local/include -I. \
+  -I$GOPATH/src \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  --grpc-gateway_out=logtostderr=true:. \
+  proto/hello_http/*.proto
 ```
+编译后生成两个go文件
 
-注意这里需要编译google/api中的两个proto文件，同时在编译hello_http.proto时使用M参数指定引入包名，最后使用
-grpc-gateway编译生成hello_http_pb.gw.go文件，这个文件就是用来做协议转换的，查看文件可以看到里面生成的
-http handler，处理proto文件中定义的路由"example/echo"接收POST参数，调用HelloHTTP服务的客户端请求grpc
-服务并响应结果。
+Step 3. 
+
 
 
 参考：http://www.topgoer.com/%E5%BE%AE%E6%9C%8D%E5%8A%A1/gRPC/HTTP%E7%BD%91%E5%85%B3.html

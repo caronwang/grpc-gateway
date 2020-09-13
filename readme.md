@@ -3,6 +3,8 @@ etcd3 API全面升级为gRPC后，同时要提供REST API服务，维护两个�
 通过protobuf的自定义option实现了一个网关，服务端同时开启gRPC和HTTP服务，HTTP服务接收客户端请求后转换为grpc
 请求数据，获取响应后转为json数据返回给客户端。
 
+
+
 ## 安装grpc-gateway
 ```shell script
 $ go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
@@ -10,27 +12,25 @@ $ go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
 ## 目录结构
 ```shell script
-|—— hello_http/
-    |—— client/
-        |—— main.go   // 客户端
-    |—— server/
-        |—— main.go   // GRPC服务端
-    |—— server_http/
-        |—— main.go   // HTTP服务端
-|—— proto/
-    |—— google       // googleApi http-proto定义
-        |—— api
-            |—— annotations.proto
-            |—— annotations.pb.go
-            |—— http.proto
-            |—— http.pb.go
-    |—— hello_http/
-        |—— hello_http.proto   // proto描述文件
-        |—— hello_http.pb.go   // proto编译后文件
-        |—— hello_http_pb.gw.go // gateway编译后文件
+├── gen.sh		//proto文件编译命令
+├── hello_http	
+│   ├── client
+│   │   └── client.go	//客户端程序
+│   ├── server_http
+│   │   └── main.go		//http服务端程序
+│   └── server_rpc
+│       └── server.go	//rpc服务端程序
+├── proto
+   └── hello_http			
+       ├── hello_http.pb.go		//protobuf生成的go文件
+       ├── hello_http.pb.gw.go	//protobuf生成的gateway文件
+       └── hello_http.proto	//protobuf文件
 ```
 
-## 代码详解
+
+
+## 使用说明
+
 Step 1. 编写proto描述文件：proto/hello_http.proto
 ```prototext
 syntax = "proto3";
@@ -79,7 +79,40 @@ protoc -I/usr/local/include -I. \
 ```
 编译后生成两个go文件
 
-Step 3. 
+       ├── hello_http.pb.go		//protobuf生成的go文件
+       ├── hello_http.pb.gw.go	//protobuf生成的gateway文件
+Step 3. 运行服务端程序
+
+```shell
+#运行RPC服务端
+go run  hello_http/server_rpc/server.go
+
+#运行HTTP服务端
+go run  hello_http/server_http/main.go
+```
+
+Step 4. 测试
+
+测试RPC客户端
+
+```shell
+#运行客户端
+go run  hello_http/client/main.go
+
+#得到返回
+Hello gRPC.
+```
+
+测试HTTP响应
+
+```
+curl -H "Content-Type: application/json" -X POST -d '{"name": "123"}'  http://127.0.0.1:8080/example/echo
+
+#得到返回
+{"message":"Hello 123."}
+```
+
+
 
 
 

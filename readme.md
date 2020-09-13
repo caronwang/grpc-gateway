@@ -63,7 +63,7 @@ message HelloHTTPResponse {
 }
 ```
 
-Step 2. 编译proto，运行gen.sh文件
+Step 2. 编译proto
 ```shell script
 protoc -I/usr/local/include -I. \
   -I$GOPATH/src \
@@ -77,10 +77,33 @@ protoc -I/usr/local/include -I. \
   --grpc-gateway_out=logtostderr=true:. \
   proto/hello_http/*.proto
 ```
+我将上面命令写入了gen.sh文件，编译的时候运行该文件`./gen.sh`
+
 编译后生成两个go文件
 
        ├── hello_http.pb.go		//protobuf生成的go文件
        ├── hello_http.pb.gw.go	//protobuf生成的gateway文件
+
+
+HTTP服务端程序
+
+```go
+// grpc服务地址
+endpoint := "127.0.0.1:50052"    //这个是RPC服务的地址
+mux := runtime.NewServeMux()
+opts := []grpc.DialOption{grpc.WithInsecure()}
+
+// HTTP转grpc
+err := gw.RegisterHelloHTTPHandlerFromEndpoint(ctx, mux, endpoint, opts)
+if err != nil {
+  grpclog.Fatalf("Register handler err:%v\n", err)
+}
+
+http.ListenAndServe(":8080", mux)
+```
+
+
+
 Step 3. 运行服务端程序
 
 ```shell
